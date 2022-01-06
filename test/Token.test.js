@@ -64,15 +64,18 @@ contract("Token", (accounts) => {
       balance.toString().should.equal(web3.utils.toWei("100", "ether"));
     });
 
-    // it("emits a transfer event", async () => {
-    //   const log = result.logs[0];
+    // event Transfer(address indexed from, address indexed to, uint256 value);
+    it("emits a transfer event", async () => {
+      const log = result.logs[0];
 
-    //   const event = log.args;
-    //   console.log(event);
-    //   event.toString().from.should.eq(accounts[0], "from is correct");
-    //   event.to.should.eq(accounts[1], "to is correct");
-    //   event.value.toString().should.eq(amount, "amount is correct");
-    // });
+      const event = log.args;
+
+      event.from.should.eq(accounts[0], "from is correct");
+      event.to.should.eq(accounts[1], "to is correct");
+      event.value
+        .toString()
+        .should.eq(web3.utils.toWei(amount, "ether"), "amount is correct");
+    });
   });
 
   describe("failure", () => {
@@ -105,14 +108,33 @@ contract("Token", (accounts) => {
     let amount;
 
     beforeEach(async () => {
-      let amount = web3.utils.toWei("100", "ether");
+      amount = web3.utils.toWei("100", "ether");
       results = await token.approve(accounts[5], amount, { from: accounts[0] });
     });
 
     describe("sucess", () => {
-      it("allocates an allowance for delegated token spending on exchange", async () => {
+      it("allocates an allowance for delegated token spending", async () => {
         const allowance = await token.allowance(accounts[0], accounts[5]);
-        allowance.toString().should.equal(amount.toString());
+
+        allowance.toString().should.eq(amount);
+      });
+
+      it("emits an Approval event", async () => {
+        const log = results.logs[0];
+
+        log.event.should.equal("Approval");
+        const eventArgs = log.args;
+
+        eventArgs.owner.should.eq(accounts[0], "owner is correct");
+        eventArgs.spender.should.eq(accounts[5], "spender is correct");
+        eventArgs.value.toString().should.eq(amount, "amount is correct");
+      });
+    });
+
+    describe("failure", () => {
+      it("rejects invalid spenders", async () => {
+        await token.approve(0x0, amount, { from: accounts[0] }).should.be
+          .rejected;
       });
     });
   });
