@@ -6,7 +6,7 @@ const wait = (sec) => {
   return new Promise((resolve) => setTimeout(resolve, millisec));
 };
 
-module.exports = async function (callback) {
+module.exports = async function(callback) {
   try {
     const accounts = await web3.eth.getAccounts();
 
@@ -31,10 +31,12 @@ module.exports = async function (callback) {
     const user1 = accounts[0];
     const user2 = accounts[1];
 
+    amount = web3.utils.toWei("100", "ether");
+    let amountEth = web3.utils.toWei("2", "ether");
     // user1 deposits ether
-    amount = web3.utils.toWei("1", "ether");
-    await exchange.depositEther({ from: user1, value: amount });
-    console.log("user1 has deposited :%d ether", amount);
+
+    await exchange.depositEther({ from: user1, value: amountEth });
+    console.log("user1 has deposited :%d ether", amountEth);
 
     // user2 deposits a token
     await token.approve(exchange.address, amount, { from: user2 });
@@ -48,8 +50,8 @@ module.exports = async function (callback) {
     const ETH_ADDRESS = "0x0000000000000000000000000000000000000000";
     let result;
     let orderId;
-    let tokens2Buy = web3.utils.toWei("100", "ether");
-    let eth2Give = web3.utils.toWei("0.1", "ether");
+    let tokens2Buy = web3.utils.toWei("9", "ether");
+    let eth2Give = web3.utils.toWei("0.01", "ether");
     result = await exchange.makeOrder(
       token.address,
       tokens2Buy,
@@ -67,7 +69,8 @@ module.exports = async function (callback) {
     console.log("order cancelled by user1 :%d", user1);
 
     // //////////////////////////////////////////////////////////////////
-    // ///// seed make and fill orders
+    // ///// seed make and fill orders  let tokens2Buy = web3.utils.toWei("9", "ether");
+    // let eth2Give = web3.utils.toWei("0.1", "ether");
 
     // user1 makes an order
     result = await exchange.makeOrder(
@@ -88,7 +91,7 @@ module.exports = async function (callback) {
     await wait(1);
 
     // user1 makes an order
-    tokens2Buy = web3.utils.toWei("50", "ether");
+    tokens2Buy = web3.utils.toWei("5", "ether");
     eth2Give = web3.utils.toWei("0.01", "ether");
     result = await exchange.makeOrder(
       token.address,
@@ -108,7 +111,7 @@ module.exports = async function (callback) {
     await wait(1);
 
     // user1 makes an order
-    tokens2Buy = web3.utils.toWei("200", "ether");
+    tokens2Buy = web3.utils.toWei("20", "ether");
     eth2Give = web3.utils.toWei("0.15", "ether");
     result = await exchange.makeOrder(
       token.address,
@@ -151,7 +154,7 @@ module.exports = async function (callback) {
         token.address,
         tokens2Buy,
 
-        { from: user1 }
+        { from: user2 }
       );
       console.log("order made by :%d", user2);
       await wait(1);
